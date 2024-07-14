@@ -1,0 +1,341 @@
+mode: rule
+log-level: info
+mixed-port: 7890
+allow-lan: false
+
+dns:
+    enable: true
+    ipv6: false
+    default-nameserver: [223.5.5.5, 119.29.29.29]
+    enhanced-mode: fake-ip
+    fake-ip-range: 198.18.0.1/16
+    use-hosts: true
+    nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
+    fallback: ['https://doh.dns.sb/dns-query', 'https://dns.cloudflare.com/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
+    fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
+
+proxy-providers:
+    cyberguard:
+      type: http
+      path: ./subscribe/cyberguard.yaml
+      url: "https://cyberguard.cfd/api/v1/client/subscribe?token=7bd6b197fd7337adbbe0db5a45829e9e&flag=clash"
+      filter: '(🇭🇰)|(🇸🇬)|(🇯🇵)|(香港)|(新加坡)|(台湾)|(日本)|(HK)|(SG)|(TW)|(JP)|(GPT)'
+      interval: 36000
+      health-check:
+        enable: true
+        interval: 600
+        url: http://www.google.com/generate_204
+
+proxies:
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    use:
+      - cyberguard
+
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  direct:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
+rules:
+  - DOMAIN,cyberguard.cfd,DIRECT
+  - DOMAIN,safebrowsing.urlsec.qq.com,DIRECT
+  - DOMAIN,safebrowsing.googleapis.com,DIRECT
+  - DOMAIN,captive.apple.com,DIRECT
+  # Apple AI
+  - DOMAIN,guzzoni.apple.com,DIRECT
+  - DOMAIN,apple-relay.apple.com,DIRECT
+  - DOMAIN-SUFFIX,smoot.apple.com,DIRECT
+  - DOMAIN,cp4.cloudflare.com,DIRECT
+  - DOMAIN,apple-relay.cloudflare.com,DIRECT
+  - DOMAIN,apple-relay.fastly-edge.com,DIRECT
+  # Apple
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,itunes.com,DIRECT
+  - DOMAIN-SUFFIX,apple-mapkit.com,DIRECT
+  - DOMAIN-SUFFIX,apple-cloudkit.com,DIRECT
+  - DOMAIN-SUFFIX,apple-livephotoskit.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-content.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-isupport.com,DIRECT
+  - DOMAIN-SUFFIX,apzones.com,DIRECT
+  - DOMAIN-SUFFIX,apple.news,DIRECT
+  - IP-CIDR,17.0.0.0/8,DIRECT,no-resolve
+  - DOMAIN-KEYWORD,apple,DIRECT
+  - PROCESS-NAME,netbiosd,DIRECT
+  - PROCESS-NAME,trusted,DIRECT
+  - PROCESS-NAME,Music,DIRECT
+  - PROCESS-NAME,Maps,DIRECT
+  # Trust
+  - DOMAIN-SUFFIX,digicert.com,DIRECT
+  - DOMAIN-SUFFIX,digicert-cn.com,DIRECT
+  - DOMAIN-SUFFIX,globalsign.com,DIRECT
+  - DOMAIN-SUFFIX,geotrust.com,DIRECT
+  - DOMAIN-SUFFIX,sectigo.com,DIRECT
+  - DOMAIN-SUFFIX,usertrust.com,DIRECT
+  - DOMAIN-SUFFIX,entrust.net,DIRECT
+  - DOMAIN-SUFFIX,verisign.net,DIRECT
+  # China
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-SUFFIX,139.com,DIRECT
+  - DOMAIN-SUFFIX,cmpassport.com,DIRECT
+  # Tencent
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,qqmail.com,DIRECT
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,tencent.com,DIRECT
+  - DOMAIN-SUFFIX,tencentcs.com,DIRECT
+  - DOMAIN-SUFFIX,tencentcloud.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,myqcloud.com,DIRECT
+  - DOMAIN-SUFFIX,qcloudcdn.com,DIRECT
+  - DOMAIN-SUFFIX,myapp.com,DIRECT
+  - PROCESS-NAME,QQ,DIRECT
+  - PROCESS-NAME,WeChat,DIRECT
+  - PROCESS-NAME,QQLive,DIRECT
+  - PROCESS-NAME,企业微信,DIRECT
+  - PROCESS-NAME,WXWork.exe,DIRECT
+  - PROCESS-NAME,WXWorkWeb.exe,DIRECT
+  - DOMAIN-KEYWORD,tencent,DIRECT
+  - DOMAIN-KEYWORD,wechat,DIRECT
+  # Alibaba
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,aliyuncs.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alipayobjects.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,alidns.com,DIRECT
+  - DOMAIN-SUFFIX,alipan.com,DIRECT
+  - DOMAIN-SUFFIX,alibaba.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-SUFFIX,youku.com,DIRECT
+  - DOMAIN-KEYWORD,alibaba,DIRECT
+  - PROCESS-NAME,优酷,DIRECT
+  # Bytedance
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,douyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,douyinpic.com,DIRECT
+  - DOMAIN-SUFFIX,douyincdn.com,DIRECT
+  - DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+  - DOMAIN-SUFFIX,douyinliving.com,DIRECT
+  - DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+  - DOMAIN-SUFFIX,toutiao.com,DIRECT
+  - DOMAIN-SUFFIX,toutiaovod.com,DIRECT
+  - DOMAIN-SUFFIX,toutiaoimg.com,DIRECT
+  - DOMAIN-SUFFIX,toutiaoapi.com,DIRECT
+  - DOMAIN-SUFFIX,toutiaostatic.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.net,DIRECT
+  - DOMAIN-SUFFIX,doupay,DIRECT
+  - DOMAIN-SUFFIX,zijieapi.com,DIRECT
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,doubao.com,DIRECT
+  - DOMAIN-SUFFIX,baike.com,DIRECT
+  - DOMAIN-SUFFIX,qishui.com,DIRECT
+  - DOMAIN-SUFFIX,huoshan.com,DIRECT
+  - DOMAIN-SUFFIX,huoshanvod.com,DIRECT
+  - DOMAIN-SUFFIX,huoshanimg.com,DIRECT
+  - DOMAIN-SUFFIX,huoshanlive.com,DIRECT
+  - DOMAIN-SUFFIX,huoshanzhibo.com,DIRECT
+  - DOMAIN-SUFFIX,huoshanstatic.com,DIRECT
+  - DOMAIN-SUFFIX,ixigua.com,DIRECT
+  - DOMAIN-SUFFIX,ixiguavideo.com,DIRECT
+  - DOMAIN-SUFFIX,bdixiguastatic.com,DIRECT
+  - DOMAIN-KEYWORD,douyin,DIRECT
+  - DOMAIN-KEYWORD,toutiao,DIRECT
+  - PROCESS-NAME,抖音,DIRECT
+  - PROCESS-NAME,VideoFusion-macOS,DIRECT
+  # Baidu
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,baidubce.com,DIRECT
+  - DOMAIN-SUFFIX,baidubcr.com,DIRECT
+  - DOMAIN-SUFFIX,bcebos.com,DIRECT
+  - DOMAIN-SUFFIX,bcelive.com,DIRECT
+  - DOMAIN-SUFFIX,iqiyi.com,DIRECT
+  - DOMAIN-SUFFIX,iqiyipic.com,DIRECT
+  # Netease
+  - DOMAIN-SUFFIX,netease.com,DIRECT
+  - DOMAIN-SUFFIX,youdao.com,DIRECT
+  - DOMAIN-SUFFIX,ydstatic.com,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,163yun.com,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+  - DOMAIN-SUFFIX,127.net,DIRECT
+  # JD
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,300hu.com,DIRECT
+  # Xiaomi
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,wps.com,DIRECT
+  - DOMAIN-SUFFIX,kingsoft.com,DIRECT
+  - DOMAIN-SUFFIX,ksyun.com,DIRECT
+  - DOMAIN-SUFFIX,ksyuncdn.com,DIRECT
+  - PROCESS-NAME,WPS Office,DIRECT
+  - DOMAIN-SUFFIX,huawei.com,DIRECT
+  - DOMAIN-SUFFIX,huaweicloud.com,DIRECT
+  - DOMAIN-SUFFIX,hicloud.com,DIRECT
+  - DOMAIN-SUFFIX,dbankcloud.com,DIRECT
+  - DOMAIN-SUFFIX,dbankcdn.com,DIRECT
+  - DOMAIN-SUFFIX,honor.com,DIRECT
+  - DOMAIN-SUFFIX,hihonor.com,DIRECT
+  - DOMAIN-SUFFIX,vivo.com,DIRECT
+  - DOMAIN-SUFFIX,oppo.com,DIRECT
+  - DOMAIN-SUFFIX,oppomobile.com,DIRECT
+  # Microsoft
+  - DOMAIN-SUFFIX,aka.ms,DIRECT
+  - DOMAIN-SUFFIX,aria.ms,DIRECT
+  - DOMAIN-SUFFIX,appcenter.ms,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft365.com,DIRECT
+  - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+  - DOMAIN-SUFFIX,microsoftpersonalcontent.com,DIRECT
+  - DOMAIN-SUFFIX,office.com,DIRECT
+  - DOMAIN-SUFFIX,office.net,DIRECT
+  - DOMAIN-SUFFIX,office365.com,DIRECT
+  - DOMAIN-SUFFIX,officecdn.com,DIRECT
+  - DOMAIN-SUFFIX,live.com,DIRECT
+  - DOMAIN-SUFFIX,live.net,DIRECT
+  - DOMAIN-SUFFIX,outlook.com,DIRECT
+  - DOMAIN-SUFFIX,onenote.com,DIRECT
+  - DOMAIN-SUFFIX,onenote.net,DIRECT
+  - DOMAIN-SUFFIX,bing.com,DIRECT
+  - DOMAIN-SUFFIX,bing.net,DIRECT
+  - DOMAIN-SUFFIX,bingapis.com,DIRECT
+  - DOMAIN-SUFFIX,visualstudio.com,DIRECT
+  - DOMAIN-SUFFIX,msdn.com,DIRECT
+  - DOMAIN-SUFFIX,msedge.net,DIRECT
+  - DOMAIN-SUFFIX,msecnd.net,DIRECT
+  - DOMAIN-SUFFIX,1drv.com,DIRECT
+  - DOMAIN-SUFFIX,sharepoint.com,DIRECT
+  - DOMAIN-SUFFIX,windows.com,DIRECT
+  - DOMAIN-SUFFIX,windows.net,DIRECT
+  - DOMAIN-SUFFIX,onedrive.com,DIRECT
+  - PROCESS-NAME,OneDrive,DIRECT
+  - PROCESS-NAME,OneDrive.exe,DIRECT
+  - DOMAIN-KEYWORD,microsoft,DIRECT
+  - DOMAIN-KEYWORD,windows,DIRECT
+  # Download
+  - DOMAIN-KEYWORD,download,DIRECT
+  - DOMAIN-SUFFIX,sourceforge.net,DIRECT
+  # Github
+  - DOMAIN-SUFFIX,github.com,PROXY
+  - DOMAIN-SUFFIX,githubusercontent.com,PROXY
+  - DOMAIN-SUFFIX,githubassets.com,PROXY
+  - DOMAIN-SUFFIX,github.io,PROXY
+  - DOMAIN-SUFFIX,github.dev,PROXY
+  - DOMAIN-SUFFIX,gitbook.com,PROXY
+  - DOMAIN-SUFFIX,gitbook.io,PROXY
+  # Maven
+  - DOMAIN-SUFFIX,maven.apache.org,DIRECT
+  - DOMAIN-SUFFIX,mvnrepository.com,DIRECT
+  - DOMAIN-SUFFIX,jitpack.io,DIRECT
+  - DOMAIN-SUFFIX,jetbrains.com,DIRECT
+  - DOMAIN-SUFFIX,toolbox.app,DIRECT
+  # Google Direct
+  - DOMAIN-SUFFIX,dl.google.com,DIRECT
+  - DOMAIN-SUFFIX,dl.l.google.com,DIRECT
+  - DOMAIN-SUFFIX,maven.google.com,DIRECT
+  - DOMAIN-SUFFIX,crashlytics.com,DIRECT
+  - DOMAIN-SUFFIX,connectivitycheck.gstatic.com,DIRECT
+  # Google
+  - DOMAIN-SUFFIX,google.com,PROXY
+  - DOMAIN-SUFFIX,googleapis.com,PROXY
+  - DOMAIN-SUFFIX,googleusercontent.com,PROXY
+  - DOMAIN-SUFFIX,googlevideo.com,PROXY
+  - DOMAIN-SUFFIX,gstatic.com,PROXY
+  - DOMAIN-SUFFIX,gmail.com,PROXY
+  - DOMAIN-SUFFIX,gsuite.com,PROXY
+  - DOMAIN-SUFFIX,chrome.com,PROXY
+  - DOMAIN-SUFFIX,android.com,PROXY
+  - DOMAIN-SUFFIX,gvt1.com,PROXY
+  - DOMAIN-SUFFIX,gvt2.com,PROXY
+  - DOMAIN-KEYWORD,google,PROXY
+  # Other
+  - DOMAIN-SUFFIX,amazon.com,DIRECT
+  - DOMAIN-SUFFIX,amazonaws.com,DIRECT
+  - DOMAIN-SUFFIX,awsstatic.com,DIRECT
+  - DOMAIN-SUFFIX,babybus.com,DIRECT
+  - DOMAIN-SUFFIX,ntp.org,DIRECT
+  # CDN
+  - DOMAIN-SUFFIX,npmjs.org,DIRECT
+  - DOMAIN-SUFFIX,jsdelivr.net,DIRECT
+  - DOMAIN-SUFFIX,akadns.net,DIRECT
+  - DOMAIN-SUFFIX,edgekey.net,DIRECT
+  - DOMAIN-SUFFIX,edgesuite.net,DIRECT
+  - DOMAIN-SUFFIX,akamai.com,DIRECT
+  - DOMAIN-SUFFIX,akamai.net,DIRECT
+  - DOMAIN-SUFFIX,akamaihd.net,DIRECT
+  - DOMAIN-SUFFIX,akamaized.net,DIRECT
+  - DOMAIN-SUFFIX,akamaiedge.net,DIRECT
+  - DOMAIN-SUFFIX,cloudflare-cn.com,DIRECT
+  - DOMAIN-SUFFIX,cloudflare.com,DIRECT
+  - DOMAIN-SUFFIX,cloudflare.net,DIRECT
+  - DOMAIN-SUFFIX,cloudflare-dns.com,DIRECT
+  - DOMAIN-SUFFIX,fastly.com,DIRECT
+  - DOMAIN-SUFFIX,fastly.net,DIRECT
+  - DOMAIN-SUFFIX,fastly-edge.com,DIRECT
+  # rule-provider
+  - RULE-SET,telegramcidr,PROXY,no-resolve
+  - PROCESS-NAME,Telegram,PROXY
+  - PROCESS-NAME,Telegram.exe,PROXY
+  - RULE-SET,direct,DIRECT
+  - RULE-SET,proxy,PROXY
+  - RULE-SET,reject,REJECT
+  # LAN
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - IP-CIDR,0.0.0.0/8,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,169.254.0.0/16,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+  - IP-CIDR,198.18.0.0/15,DIRECT
+  - IP-CIDR,224.0.0.0/3,DIRECT
+  - IP-CIDR6,::/127,DIRECT
+  - IP-CIDR6,fc00::/7,DIRECT
+  - IP-CIDR6,fe80::/10,DIRECT
+  - IP-CIDR6,ff00::/8,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
