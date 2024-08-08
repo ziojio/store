@@ -1,0 +1,33 @@
+# Github
+DOMAIN-SUFFIX,github.com
+DOMAIN-SUFFIX,githubusercontent.com
+DOMAIN-SUFFIX,githubassets.com
+DOMAIN-SUFFIX,github.io
+DOMAIN-SUFFIX,github.dev
+DOMAIN-SUFFIX,gitbook.com
+DOMAIN-SUFFIX,gitbook.io
+# Google
+DOMAIN-SUFFIX,google.com
+DOMAIN-SUFFIX,googleapis.com
+DOMAIN-SUFFIX,googleusercontent.com
+DOMAIN-SUFFIX,googlevideo.com
+DOMAIN-SUFFIX,googledomains.com
+DOMAIN-SUFFIX,gstatic.com
+DOMAIN-SUFFIX,gmail.com
+DOMAIN-SUFFIX,gsuite.com
+DOMAIN-SUFFIX,nest.com
+DOMAIN-SUFFIX,chrome.com
+DOMAIN-SUFFIX,android.com
+DOMAIN-SUFFIX,withgoogle.com
+DOMAIN-SUFFIX,gvt1.com
+DOMAIN-KEYWORD,google
+# Youtube
+DOMAIN-SUFFIX,youtube.com
+DOMAIN-SUFFIX,ytimg.com
+# Telegram
+DOMAIN-SUFFIX,t.me
+DOMAIN-SUFFIX,telegram.org
+DOMAIN-SUFFIX,tdesktop.com
+DOMAIN-SUFFIX,telegram.me
+# Proxy
+DOMAIN-SUFFIX,v2ex.com
